@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 4%;
+    --foreground: 210 40% 98%;
+
+    --card: 240 10% 6%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 240 10% 6%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 239 84% 67%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 240 10% 10%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 240 10% 14%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 240 10% 14%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 240 10% 14%;
+    --input: 240 10% 14%;
+    --ring: 239 84% 67%;
+
+    --radius: 0.5rem;
+
+    --chart-1: 239 84% 67%;
+    --chart-2: 142 71% 45%;
+    --chart-3: 0 84% 60%;
+    --chart-4: 43 96% 56%;
+    --chart-5: 280 82% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar for dark theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/30;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent;
+  }
+
+  .glass {
+    @apply bg-card/80 backdrop-blur-sm;
+  }
+
+  .profit-text {
+    @apply text-profit;
+  }
+
+  .loss-text {
+    @apply text-loss;
+  }
+
+  .glow {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+
+  .glow-profit {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+  }
+
+  .glow-loss {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+  }
+}
+
+/* Chart customizations */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: hsl(240 10% 14%);
+}
+
+.recharts-tooltip-wrapper {
+  outline: none;
+}
+
+/* Terminal-style data display */
+.data-mono {
+  font-family: var(--font-mono), "JetBrains Mono", "Fira Code", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
