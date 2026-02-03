@@ -1,22 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { CalendarHeatmap } from "@/components/journal/CalendarHeatmap";
 import { TradeEntryForm } from "@/components/journal/TradeEntryForm";
 import { JournalEntryCard } from "@/components/journal/JournalEntryCard";
 import { JournalStats } from "@/components/journal/JournalStats";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useJournalStore } from "@/stores/journal-store";
-import { mockCalendarData } from "@/lib/mock-data";
+import { useTradesStore } from "@/stores/trades-store";
+import { generateDailyStats, generateCalendarData } from "@/lib/analytics";
 import { Search, X } from "lucide-react";
 
 export default function JournalPage() {
-  const { entries, getAllTags, getEntriesByTag, getEntriesByDate } = useJournalStore();
+  const { connected } = useWallet();
+  const { entries, getAllTags } = useJournalStore();
+  const { trades } = useTradesStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  const hasData = trades.length > 0 || entries.length > 0;
+
+  // Generate calendar data from trades
+  const calendarData = useMemo(() => {
+    if (trades.length === 0) return [];
+    const dailyStats = generateDailyStats(trades);
+    return generateCalendarData(dailyStats);
+  }, [trades]);
 
   const allTags = getAllTags();
 
@@ -73,6 +87,21 @@ export default function JournalPage() {
   const hasFilters =
     searchQuery || selectedTags.length > 0 || selectedDate;
 
+  // Show empty state if no data
+  if (!hasData) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Trading Journal</h1>
+          <p className="text-muted-foreground">
+            Track your trades, emotions, and lessons learned
+          </p>
+        </div>
+        <EmptyState isConnected={connected} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -91,7 +120,7 @@ export default function JournalPage() {
         {/* Left Column - Calendar and Stats */}
         <div className="space-y-6">
           <CalendarHeatmap
-            data={mockCalendarData}
+            data={calendarData}
             onDayClick={handleDayClick}
           />
           <JournalStats />
@@ -112,18 +141,20 @@ export default function JournalPage() {
             </div>
 
             {/* Tags filter */}
-            <div className="flex flex-wrap gap-1">
-              {allTags.slice(0, 10).map((tag) => (
-                <Badge
-                  key={tag}
-                  variant={selectedTags.includes(tag) ? "default" : "outline"}
-                  className="cursor-pointer transition-colors"
-                  onClick={() => handleTagClick(tag)}
-                >
-                  #{tag}
-                </Badge>
-              ))}
-            </div>
+            {allTags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {allTags.slice(0, 10).map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant={selectedTags.includes(tag) ? "default" : "outline"}
+                    className="cursor-pointer transition-colors"
+                    onClick={() => handleTagClick(tag)}
+                  >
+                    #{tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
 
             {/* Active filters */}
             {hasFilters && (

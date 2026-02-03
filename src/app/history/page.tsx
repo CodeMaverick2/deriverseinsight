@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,15 +14,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FilterPanel } from "@/components/history/FilterPanel";
 import { TradeTable } from "@/components/history/TradeTable";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { useTradesStore } from "@/stores/trades-store";
 import { exportToCSV, exportToJSON, exportReport } from "@/lib/export";
 import { formatCurrency } from "@/lib/utils";
 import { Download, FileText, FileJson, FileSpreadsheet, History } from "lucide-react";
 
 export default function HistoryPage() {
+  const { connected } = useWallet();
   const { trades, filters, setFilters, resetFilters, getFilteredTrades } = useTradesStore();
 
   const filteredTrades = getFilteredTrades();
+  const hasData = trades.length > 0;
 
   // Get unique symbols for filter
   const symbols = useMemo(() => {
@@ -44,6 +48,21 @@ export default function HistoryPage() {
 
     return { totalPnl, totalFees, totalVolume, winRate, count: filteredTrades.length };
   }, [filteredTrades]);
+
+  // Show empty state if no data
+  if (!hasData) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Trade History</h1>
+          <p className="text-muted-foreground">
+            View and export your complete trading history
+          </p>
+        </div>
+        <EmptyState isConnected={connected} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

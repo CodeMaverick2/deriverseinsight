@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Calendar } from "lucide-react";
 
 type Period = "1D" | "1W" | "1M" | "3M" | "1Y" | "ALL";
 
@@ -19,17 +20,20 @@ export function PeriodSelector({
   className,
 }: PeriodSelectorProps) {
   return (
-    <div className={cn("flex items-center gap-1 bg-muted rounded-lg p-1", className)}>
+    <div className={cn(
+      "flex items-center gap-1 rounded-xl bg-muted/30 border border-border/50 p-1 backdrop-blur-sm",
+      className
+    )}>
       {periods.map((period) => (
         <Button
           key={period}
           variant={value === period ? "default" : "ghost"}
           size="sm"
           className={cn(
-            "h-7 px-3 text-xs",
+            "h-7 px-3 text-xs font-semibold rounded-lg transition-all duration-200",
             value === period
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:text-foreground"
+              ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-sm shadow-primary/20"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
           )}
           onClick={() => onChange(period)}
         >

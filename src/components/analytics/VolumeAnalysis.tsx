@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import { Trade } from "@/types";
 import { format, subDays, eachDayOfInterval } from "date-fns";
+import { BarChart3 } from "lucide-react";
 
 interface VolumeAnalysisProps {
   trades: Trade[];
@@ -61,52 +62,69 @@ export function VolumeAnalysis({ trades, days = 30 }: VolumeAnalysisProps) {
   const totalFees = data.reduce((sum, d) => sum + d.fees, 0);
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
+    <Card className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <CardHeader className="relative pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-medium">
-            Volume & Fees (Last {days} Days)
-          </CardTitle>
-          <div className="flex gap-4 text-sm">
-            <div>
-              <span className="text-muted-foreground">Volume: </span>
-              <span className="font-mono font-medium">
+          <div className="flex items-center gap-2">
+            <div className="rounded-lg bg-primary/10 p-1.5">
+              <BarChart3 className="h-4 w-4 text-primary" />
+            </div>
+            <CardTitle className="text-base font-medium text-foreground/90">
+              Volume & Fees (Last {days} Days)
+            </CardTitle>
+          </div>
+          <div className="flex gap-3 text-sm">
+            <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5">
+              <div className="h-2 w-2 rounded-full bg-primary" />
+              <span className="font-mono text-xs font-medium">
                 {formatCurrency(totalVolume)}
               </span>
             </div>
-            <div>
-              <span className="text-muted-foreground">Fees: </span>
-              <span className="font-mono font-medium text-loss">
+            <div className="flex items-center gap-1.5 rounded-full bg-red-500/10 px-2.5 py-0.5">
+              <div className="h-2 w-2 rounded-full bg-red-400" />
+              <span className="font-mono text-xs font-medium text-red-400">
                 {formatCurrency(totalFees)}
               </span>
             </div>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative">
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data}
               margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
             >
+              <defs>
+                <linearGradient id="volumeGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity={1} />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity={0.8} />
+                </linearGradient>
+                <linearGradient id="feesGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#f87171" stopOpacity={1} />
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0.8} />
+                </linearGradient>
+              </defs>
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="hsl(240 10% 14%)"
+                stroke="hsl(240 10% 12%)"
                 vertical={false}
+                opacity={0.5}
               />
               <XAxis
                 dataKey="date"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "hsl(215 20% 65%)", fontSize: 12 }}
+                tick={{ fill: "hsl(240 5% 55%)", fontSize: 11 }}
                 interval="preserveStartEnd"
               />
               <YAxis
                 yAxisId="volume"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "hsl(215 20% 65%)", fontSize: 12 }}
+                tick={{ fill: "hsl(240 5% 55%)", fontSize: 11 }}
                 tickFormatter={(value) => formatCurrency(value)}
               />
               <YAxis
@@ -114,7 +132,7 @@ export function VolumeAnalysis({ trades, days = 30 }: VolumeAnalysisProps) {
                 orientation="right"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "hsl(215 20% 65%)", fontSize: 12 }}
+                tick={{ fill: "hsl(240 5% 55%)", fontSize: 11 }}
                 tickFormatter={(value) => `$${value.toFixed(0)}`}
               />
               <Tooltip
@@ -122,42 +140,47 @@ export function VolumeAnalysis({ trades, days = 30 }: VolumeAnalysisProps) {
                   if (active && payload && payload.length) {
                     const data = payload[0].payload;
                     return (
-                      <div className="rounded-lg border bg-card p-3 shadow-lg">
-                        <p className="font-medium mb-1">{data.date}</p>
-                        <p className="font-mono text-sm">
-                          Volume:{" "}
-                          <span className="text-primary">
-                            {formatCurrency(data.volume)}
-                          </span>
-                        </p>
-                        <p className="font-mono text-sm">
-                          Fees:{" "}
-                          <span className="text-loss">
-                            {formatCurrency(data.fees)}
-                          </span>
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {data.trades} trades
-                        </p>
+                      <div className="rounded-xl border border-border/50 bg-card/95 backdrop-blur-xl p-3 shadow-xl shadow-black/20">
+                        <p className="font-semibold text-foreground mb-2">{data.date}</p>
+                        <div className="space-y-1">
+                          <p className="font-mono text-sm">
+                            <span className="text-muted-foreground">Volume: </span>
+                            <span className="font-semibold text-primary">
+                              {formatCurrency(data.volume)}
+                            </span>
+                          </p>
+                          <p className="font-mono text-sm">
+                            <span className="text-muted-foreground">Fees: </span>
+                            <span className="font-semibold text-red-400">
+                              {formatCurrency(data.fees)}
+                            </span>
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {data.trades} trades
+                          </p>
+                        </div>
                       </div>
                     );
                   }
                   return null;
                 }}
               />
-              <Legend />
+              <Legend
+                wrapperStyle={{ paddingTop: "12px" }}
+                formatter={(value) => <span className="text-xs text-muted-foreground">{value}</span>}
+              />
               <Bar
                 yAxisId="volume"
                 dataKey="volume"
                 name="Volume"
-                fill="#6366f1"
+                fill="url(#volumeGradient)"
                 radius={[4, 4, 0, 0]}
               />
               <Bar
                 yAxisId="fees"
                 dataKey="fees"
                 name="Fees"
-                fill="#ef4444"
+                fill="url(#feesGradient)"
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>

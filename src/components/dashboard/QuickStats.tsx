@@ -1,9 +1,8 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { cn, formatCurrency, formatPercentage } from "@/lib/utils";
-import { TrendingUp, TrendingDown, Target, Zap } from "lucide-react";
+import { TrendingUp, TrendingDown, Target, Zap, Clock, Activity } from "lucide-react";
 
 interface QuickStatsProps {
   todayPnl: number;
@@ -37,50 +36,53 @@ export function QuickStats({
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
+    <Card className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <CardHeader className="relative pb-3">
         <CardTitle className="text-base font-medium flex items-center gap-2">
-          <Zap className="h-4 w-4 text-primary" />
-          Quick Stats
+          <div className="rounded-lg bg-primary/10 p-1.5">
+            <Zap className="h-4 w-4 text-primary" />
+          </div>
+          <span className="text-foreground/90">Quick Stats</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="relative space-y-4">
         {/* Performance by Period */}
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+        <div className="space-y-3">
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
             Performance
           </p>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <p className="text-xs text-muted-foreground">Today</p>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="rounded-lg bg-muted/30 p-2.5 transition-colors hover:bg-muted/50">
+              <p className="text-[10px] text-muted-foreground mb-1">Today</p>
               <p
                 className={cn(
-                  "font-mono font-semibold",
-                  todayPnl >= 0 ? "text-profit" : "text-loss"
+                  "font-mono text-sm font-bold tracking-tight",
+                  todayPnl >= 0 ? "text-emerald-400" : "text-red-400"
                 )}
               >
                 {todayPnl >= 0 ? "+" : ""}
                 {formatCurrency(todayPnl)}
               </p>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground">This Week</p>
+            <div className="rounded-lg bg-muted/30 p-2.5 transition-colors hover:bg-muted/50">
+              <p className="text-[10px] text-muted-foreground mb-1">This Week</p>
               <p
                 className={cn(
-                  "font-mono font-semibold",
-                  weekPnl >= 0 ? "text-profit" : "text-loss"
+                  "font-mono text-sm font-bold tracking-tight",
+                  weekPnl >= 0 ? "text-emerald-400" : "text-red-400"
                 )}
               >
                 {weekPnl >= 0 ? "+" : ""}
                 {formatCurrency(weekPnl)}
               </p>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground">This Month</p>
+            <div className="rounded-lg bg-muted/30 p-2.5 transition-colors hover:bg-muted/50">
+              <p className="text-[10px] text-muted-foreground mb-1">This Month</p>
               <p
                 className={cn(
-                  "font-mono font-semibold",
-                  monthPnl >= 0 ? "text-profit" : "text-loss"
+                  "font-mono text-sm font-bold tracking-tight",
+                  monthPnl >= 0 ? "text-emerald-400" : "text-red-400"
                 )}
               >
                 {monthPnl >= 0 ? "+" : ""}
@@ -90,32 +92,33 @@ export function QuickStats({
           </div>
         </div>
 
-        <Separator />
+        {/* Divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
         {/* Best/Worst Trades */}
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+        <div className="space-y-3">
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
             Extremes
           </p>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-2">
-              <div className="rounded-full bg-profit/10 p-1.5">
-                <TrendingUp className="h-3 w-3 text-profit" />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex items-center gap-2.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 p-2.5">
+              <div className="rounded-lg bg-emerald-500/10 p-1.5">
+                <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Best Trade</p>
-                <p className="font-mono font-semibold text-profit">
+                <p className="text-[10px] text-muted-foreground">Best Trade</p>
+                <p className="font-mono text-sm font-bold text-emerald-400">
                   +{formatCurrency(bestTrade)}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="rounded-full bg-loss/10 p-1.5">
-                <TrendingDown className="h-3 w-3 text-loss" />
+            <div className="flex items-center gap-2.5 rounded-lg bg-red-500/5 border border-red-500/10 p-2.5">
+              <div className="rounded-lg bg-red-500/10 p-1.5">
+                <TrendingDown className="h-3.5 w-3.5 text-red-400" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Worst Trade</p>
-                <p className="font-mono font-semibold text-loss">
+                <p className="text-[10px] text-muted-foreground">Worst Trade</p>
+                <p className="font-mono text-sm font-bold text-red-400">
                   {formatCurrency(worstTrade)}
                 </p>
               </div>
@@ -123,20 +126,21 @@ export function QuickStats({
           </div>
         </div>
 
-        <Separator />
+        {/* Divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
         {/* Additional Metrics */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center gap-2">
-            <div className="rounded-full bg-primary/10 p-1.5">
-              <Target className="h-3 w-3 text-primary" />
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-center gap-2.5 rounded-lg bg-muted/30 p-2.5">
+            <div className="rounded-lg bg-primary/10 p-1.5">
+              <Target className="h-3.5 w-3.5 text-primary" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Expectancy</p>
+              <p className="text-[10px] text-muted-foreground">Expectancy</p>
               <p
                 className={cn(
-                  "font-mono font-semibold",
-                  expectancy >= 0 ? "text-profit" : "text-loss"
+                  "font-mono text-sm font-bold",
+                  expectancy >= 0 ? "text-emerald-400" : "text-red-400"
                 )}
               >
                 {expectancy >= 0 ? "+" : ""}
@@ -144,11 +148,16 @@ export function QuickStats({
               </p>
             </div>
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Avg Duration</p>
-            <p className="font-mono font-semibold">
-              {formatDuration(avgTradeDuration)}
-            </p>
+          <div className="flex items-center gap-2.5 rounded-lg bg-muted/30 p-2.5">
+            <div className="rounded-lg bg-primary/10 p-1.5">
+              <Clock className="h-3.5 w-3.5 text-primary" />
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground">Avg Duration</p>
+              <p className="font-mono text-sm font-bold">
+                {formatDuration(avgTradeDuration)}
+              </p>
+            </div>
           </div>
         </div>
       </CardContent>

@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { Trade, Position, TradeFilters, MarketType, TradeSide, OrderType, TradeStatus } from "@/types";
-import { mockTrades, mockPositions, calculateAnalytics } from "@/lib/mock-data";
+import { Trade, Position, TradeFilters } from "@/types";
+import { calculateAnalytics } from "@/lib/analytics";
 
 interface TradesState {
   // Data
@@ -22,13 +22,13 @@ interface TradesState {
   addTrade: (trade: Trade) => void;
   updateTrade: (id: string, updates: Partial<Trade>) => void;
   deleteTrade: (id: string) => void;
+  setTrades: (trades: Trade[]) => void;
+  setPositions: (positions: Position[]) => void;
+  clearData: () => void;
 
   // Data loading
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
-
-  // Initialize with mock data
-  initializeMockData: () => void;
 }
 
 const defaultFilters: TradeFilters = {
@@ -44,9 +44,9 @@ const defaultFilters: TradeFilters = {
 };
 
 export const useTradesStore = create<TradesState>((set, get) => ({
-  // Initial data
-  trades: mockTrades,
-  positions: mockPositions,
+  // Initial data - empty, will be populated from blockchain
+  trades: [],
+  positions: [],
 
   // Filters
   filters: defaultFilters,
@@ -157,14 +157,13 @@ export const useTradesStore = create<TradesState>((set, get) => ({
       trades: state.trades.filter((trade) => trade.id !== id),
     })),
 
+  setTrades: (trades) => set({ trades }),
+
+  setPositions: (positions) => set({ positions }),
+
+  clearData: () => set({ trades: [], positions: [] }),
+
   // Loading state
   isLoading: false,
   setIsLoading: (loading) => set({ isLoading: loading }),
-
-  // Initialize mock data
-  initializeMockData: () =>
-    set({
-      trades: mockTrades,
-      positions: mockPositions,
-    }),
 }));

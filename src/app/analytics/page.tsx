@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { PerformanceMetrics } from "@/components/analytics/PerformanceMetrics";
 import { WinRateChart } from "@/components/analytics/WinRateChart";
 import { VolumeAnalysis } from "@/components/analytics/VolumeAnalysis";
@@ -8,14 +10,17 @@ import { TimeAnalysis } from "@/components/analytics/TimeAnalysis";
 import { OrderTypeAnalysis } from "@/components/analytics/OrderTypeAnalysis";
 import { FeeBreakdown } from "@/components/analytics/FeeBreakdown";
 import { PeriodSelector, getPeriodDateRange } from "@/components/shared/PeriodSelector";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { useAppStore } from "@/stores/app-store";
 import { useTradesStore } from "@/stores/trades-store";
-import { useMemo } from "react";
 
 export default function AnalyticsPage() {
+  const { connected } = useWallet();
   const { selectedPeriod, setSelectedPeriod } = useAppStore();
   const { trades, getAnalytics } = useTradesStore();
   const analytics = getAnalytics();
+
+  const hasData = trades.length > 0;
 
   // Filter trades by selected period
   const filteredTrades = useMemo(() => {
@@ -25,6 +30,23 @@ export default function AnalyticsPage() {
       return tradeDate >= start && tradeDate <= end;
     });
   }, [trades, selectedPeriod]);
+
+  // Show empty state if no data
+  if (!hasData) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Analytics</h1>
+            <p className="text-muted-foreground">
+              Deep dive into your trading performance
+            </p>
+          </div>
+        </div>
+        <EmptyState isConnected={connected} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

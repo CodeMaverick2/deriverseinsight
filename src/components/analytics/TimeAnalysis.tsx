@@ -124,21 +124,32 @@ export function TimeAnalysis({ trades }: TimeAnalysisProps) {
           data={data}
           margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
         >
+          <defs>
+            <linearGradient id="timeWinGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#22c55e" stopOpacity={1} />
+              <stop offset="100%" stopColor="#22c55e" stopOpacity={0.7} />
+            </linearGradient>
+            <linearGradient id="timeLossGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#ef4444" stopOpacity={1} />
+              <stop offset="100%" stopColor="#ef4444" stopOpacity={0.7} />
+            </linearGradient>
+          </defs>
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="hsl(240 10% 14%)"
+            stroke="hsl(240 10% 12%)"
             vertical={false}
+            opacity={0.5}
           />
           <XAxis
             dataKey={xAxisKey}
             axisLine={false}
             tickLine={false}
-            tick={{ fill: "hsl(215 20% 65%)", fontSize: 11 }}
+            tick={{ fill: "hsl(240 5% 55%)", fontSize: 11 }}
           />
           <YAxis
             axisLine={false}
             tickLine={false}
-            tick={{ fill: "hsl(215 20% 65%)", fontSize: 12 }}
+            tick={{ fill: "hsl(240 5% 55%)", fontSize: 11 }}
             tickFormatter={(value) => formatCurrency(value)}
           />
           <Tooltip
@@ -146,31 +157,31 @@ export function TimeAnalysis({ trades }: TimeAnalysisProps) {
               if (active && payload && payload.length) {
                 const data = payload[0].payload;
                 return (
-                  <div className="rounded-lg border bg-card p-3 shadow-lg">
-                    <p className="font-medium">{data[xAxisKey]}</p>
-                    <p className="font-mono text-sm">
-                      PnL:{" "}
-                      <span
-                        className={data.pnl >= 0 ? "text-profit" : "text-loss"}
-                      >
-                        {data.pnl >= 0 ? "+" : ""}
-                        {formatCurrency(data.pnl)}
-                      </span>
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {data.trades} trades • {data.winRate.toFixed(0)}% win rate
-                    </p>
+                  <div className="rounded-xl border border-border/50 bg-card/95 backdrop-blur-xl p-3 shadow-xl shadow-black/20">
+                    <p className="font-semibold text-foreground mb-2">{data[xAxisKey]}</p>
+                    <div className="space-y-1">
+                      <p className="font-mono text-sm">
+                        <span className="text-muted-foreground">PnL: </span>
+                        <span className={`font-semibold ${data.pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                          {data.pnl >= 0 ? "+" : ""}
+                          {formatCurrency(data.pnl)}
+                        </span>
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {data.trades} trades • {data.winRate.toFixed(0)}% win rate
+                      </p>
+                    </div>
                   </div>
                 );
               }
               return null;
             }}
           />
-          <Bar dataKey="pnl" name={name} radius={[4, 4, 0, 0]}>
+          <Bar dataKey="pnl" name={name} radius={[6, 6, 0, 0]}>
             {data.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
-                fill={entry.pnl >= 0 ? "#22c55e" : "#ef4444"}
+                fill={entry.pnl >= 0 ? "url(#timeWinGradient)" : "url(#timeLossGradient)"}
               />
             ))}
           </Bar>
@@ -180,18 +191,27 @@ export function TimeAnalysis({ trades }: TimeAnalysisProps) {
   );
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base font-medium">
-          Time-Based Analysis
-        </CardTitle>
+    <Card className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <CardHeader className="relative pb-2">
+        <div className="flex items-center gap-2">
+          <div className="rounded-lg bg-primary/10 p-1.5">
+            <svg className="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <CardTitle className="text-base font-medium text-foreground/90">
+            Time-Based Analysis
+          </CardTitle>
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative">
         <Tabs defaultValue="hourly">
-          <TabsList className="mb-4">
-            <TabsTrigger value="hourly">By Hour</TabsTrigger>
-            <TabsTrigger value="daily">By Day</TabsTrigger>
-            <TabsTrigger value="session">By Session</TabsTrigger>
+          <TabsList className="mb-4 bg-muted/30 border border-border/30">
+            <TabsTrigger value="hourly" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">By Hour</TabsTrigger>
+            <TabsTrigger value="daily" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">By Day</TabsTrigger>
+            <TabsTrigger value="session" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">By Session</TabsTrigger>
           </TabsList>
 
           <TabsContent value="hourly">

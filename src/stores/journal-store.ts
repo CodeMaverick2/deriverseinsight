@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { JournalEntry, Sentiment } from "@/types";
-import { mockJournalEntries } from "@/lib/mock-data";
 
 interface JournalState {
   // Data
@@ -41,7 +40,7 @@ const generateId = () => Math.random().toString(36).substring(2, 15);
 export const useJournalStore = create<JournalState>()(
   persist(
     (set, get) => ({
-      entries: mockJournalEntries,
+      entries: [],
 
       addEntry: (entryData) => {
         const entry: JournalEntry = {

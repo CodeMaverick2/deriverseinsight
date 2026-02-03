@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Wallet, ChevronDown, ExternalLink, Copy, Check } from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { Wallet, ChevronDown, ExternalLink, Copy, Check, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,14 +13,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { useWalletStore } from "@/stores/wallet-store";
 import { shortenAddress } from "@/lib/utils";
-import { cn } from "@/lib/utils";
 
 export function Header() {
-  const { isConnected, walletAddress, network, setNetwork, disconnect } = useWalletStore();
+  const { publicKey, connected, disconnect } = useWallet();
+  const { setVisible } = useWalletModal();
   const [copied, setCopied] = useState(false);
+
+  const walletAddress = publicKey?.toBase58() || null;
 
   const handleCopy = () => {
     if (walletAddress) {
@@ -29,107 +31,93 @@ export function Header() {
   };
 
   const handleConnect = () => {
-    // Simulate wallet connection for demo
-    useWalletStore.setState({
-      isConnected: true,
-      walletAddress: "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
-    });
+    setVisible(true);
+  };
+
+  const handleDisconnect = async () => {
+    try {
+      await disconnect();
+    } catch (error) {
+      console.error("Failed to disconnect:", error);
+    }
+  };
+
+  const getExplorerUrl = (address: string) => {
+    return `https://explorer.solana.com/address/${address}`;
   };
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-card px-6">
-      {/* Left side - Page title or breadcrumb would go here */}
-      <div className="flex items-center gap-4">
-        <Badge variant="outline" className="font-mono text-xs">
-          {network.toUpperCase()}
-        </Badge>
+    <header className="relative flex h-16 items-center justify-between border-b border-border/50 bg-card/30 backdrop-blur-xl px-6">
+      {/* Subtle gradient */}
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent pointer-events-none" />
+
+      {/* Left side - Network Status */}
+      <div className="relative flex items-center gap-3">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+          <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">
+            Mainnet
+          </span>
+        </div>
       </div>
 
       {/* Right side - Wallet connection */}
-      <div className="flex items-center gap-4">
-        {/* Network Selector */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2">
-              <div
-                className={cn(
-                  "h-2 w-2 rounded-full",
-                  network === "mainnet-beta" ? "bg-profit" : "bg-yellow-500"
-                )}
-              />
-              {network === "mainnet-beta" ? "Mainnet" : network === "devnet" ? "Devnet" : "Testnet"}
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Select Network</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setNetwork("mainnet-beta")}>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-profit" />
-                Mainnet
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setNetwork("devnet")}>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-yellow-500" />
-                Devnet
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setNetwork("testnet")}>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-orange-500" />
-                Testnet
-              </div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
+      <div className="relative flex items-center gap-3">
         {/* Wallet Connection */}
-        {isConnected && walletAddress ? (
+        {connected && walletAddress ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                <Wallet className="h-4 w-4" />
-                <span className="font-mono">{shortenAddress(walletAddress)}</span>
-                <ChevronDown className="h-4 w-4" />
+              <Button
+                variant="outline"
+                className="gap-2 rounded-xl border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/30"
+              >
+                <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary/20">
+                  <Wallet className="h-3.5 w-3.5 text-primary" />
+                </div>
+                <span className="font-mono font-medium">{shortenAddress(walletAddress)}</span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Wallet</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-xs text-muted-foreground">
+                Connected Wallet
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleCopy}>
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-mono text-xs">{shortenAddress(walletAddress, 6)}</span>
-                  {copied ? (
-                    <Check className="h-4 w-4 text-profit" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </div>
+              <DropdownMenuItem onClick={handleCopy} className="gap-2">
+                <span className="font-mono text-xs flex-1">
+                  {shortenAddress(walletAddress, 8)}
+                </span>
+                {copied ? (
+                  <Check className="h-4 w-4 text-emerald-400" />
+                ) : (
+                  <Copy className="h-4 w-4 text-muted-foreground" />
+                )}
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <a
-                  href={`https://explorer.solana.com/address/${walletAddress}?cluster=${network}`}
+                  href={getExplorerUrl(walletAddress)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between"
+                  className="gap-2"
                 >
-                  View on Explorer
-                  <ExternalLink className="h-4 w-4" />
+                  <span>View on Explorer</span>
+                  <ExternalLink className="h-4 w-4 ml-auto text-muted-foreground" />
                 </a>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={disconnect}
-                className="text-destructive focus:text-destructive"
+                onClick={handleDisconnect}
+                className="text-red-400 focus:text-red-400 focus:bg-red-500/10"
               >
                 Disconnect
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button onClick={handleConnect} className="gap-2">
+          <Button
+            onClick={handleConnect}
+            className="gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-primary/20 transition-all hover:shadow-primary/30 hover:scale-[1.02]"
+          >
             <Wallet className="h-4 w-4" />
             Connect Wallet
           </Button>

@@ -1,19 +1,45 @@
 "use client";
 
 import { useMemo } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { PositionsTable } from "@/components/portfolio/PositionsTable";
 import { AllocationChart } from "@/components/portfolio/AllocationChart";
 import { RiskMetrics } from "@/components/portfolio/RiskMetrics";
 import { EquityCurve } from "@/components/charts/EquityCurve";
 import { MetricCard } from "@/components/dashboard/MetricCard";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { useTradesStore } from "@/stores/trades-store";
-import { mockEquityCurve } from "@/lib/mock-data";
-import { formatCurrency, formatNumber } from "@/lib/utils";
+import { generateEquityCurve } from "@/lib/analytics";
+import { formatCurrency } from "@/lib/utils";
 import { Wallet, TrendingUp, AlertTriangle, Activity } from "lucide-react";
 
 export default function PortfolioPage() {
+  const { connected } = useWallet();
   const { positions, trades, getAnalytics } = useTradesStore();
   const analytics = getAnalytics();
+
+  const hasData = trades.length > 0 || positions.length > 0;
+
+  // Generate equity curve from trades
+  const equityCurve = useMemo(() => {
+    if (trades.length === 0) return [];
+    return generateEquityCurve(trades);
+  }, [trades]);
+
+  // Show empty state if no data
+  if (!hasData) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Portfolio</h1>
+          <p className="text-muted-foreground">
+            Manage your positions and analyze portfolio risk
+          </p>
+        </div>
+        <EmptyState isConnected={connected} />
+      </div>
+    );
+  }
 
   // Calculate total portfolio value
   const totalPortfolioValue = useMemo(() => {
@@ -103,9 +129,9 @@ export default function PortfolioPage() {
 
       {/* Equity and Risk */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <EquityCurve data={mockEquityCurve} />
+        <EquityCurve data={equityCurve} />
         <RiskMetrics
-          equityCurve={mockEquityCurve}
+          equityCurve={equityCurve}
           winRate={analytics.winRate}
           profitFactor={analytics.profitFactor}
           totalTrades={analytics.totalTrades}

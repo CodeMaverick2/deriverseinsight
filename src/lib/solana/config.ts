@@ -2,6 +2,8 @@ import { clusterApiUrl, Connection } from "@solana/web3.js";
 
 export type NetworkType = "devnet" | "mainnet-beta" | "testnet";
 
+export const DEFAULT_NETWORK: NetworkType = "mainnet-beta";
+
 export const NETWORK_CONFIG: Record<
   NetworkType,
   { name: string; endpoint: string }
@@ -20,13 +22,13 @@ export const NETWORK_CONFIG: Record<
   },
 };
 
-export function getConnection(network: NetworkType): Connection {
+export function getConnection(network: NetworkType = DEFAULT_NETWORK): Connection {
   return new Connection(NETWORK_CONFIG[network].endpoint, "confirmed");
 }
 
 export function getExplorerUrl(
   address: string,
-  network: NetworkType = "devnet"
+  network: NetworkType = DEFAULT_NETWORK
 ): string {
   const baseUrl = "https://explorer.solana.com";
   const clusterParam = network === "mainnet-beta" ? "" : `?cluster=${network}`;
@@ -35,7 +37,7 @@ export function getExplorerUrl(
 
 export function getTxExplorerUrl(
   signature: string,
-  network: NetworkType = "devnet"
+  network: NetworkType = DEFAULT_NETWORK
 ): string {
   const baseUrl = "https://explorer.solana.com";
   const clusterParam = network === "mainnet-beta" ? "" : `?cluster=${network}`;

@@ -24,7 +24,7 @@ export const useWalletStore = create<WalletState>((set) => ({
   isConnected: false,
   isConnecting: false,
   walletAddress: null,
-  network: "devnet",
+  network: "mainnet-beta",
 
   // Actions
   setConnected: (connected) => set({ isConnected: connected }),

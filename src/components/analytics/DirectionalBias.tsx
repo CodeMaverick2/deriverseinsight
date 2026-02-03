@@ -71,19 +71,29 @@ export function DirectionalBias({ trades }: DirectionalBiasProps) {
       : "0";
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
+    <Card className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <CardHeader className="relative pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-medium">
-            Directional Analysis
-          </CardTitle>
-          <div className="text-sm">
-            <span className="text-muted-foreground">L/S Ratio: </span>
-            <span className="font-mono font-medium">{ratio}</span>
+          <div className="flex items-center gap-2">
+            <div className="rounded-lg bg-primary/10 p-1.5">
+              <svg className="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="20" x2="12" y2="10"/>
+                <line x1="18" y1="20" x2="18" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="16"/>
+              </svg>
+            </div>
+            <CardTitle className="text-base font-medium text-foreground/90">
+              Directional Analysis
+            </CardTitle>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-full bg-muted/50 px-2.5 py-1">
+            <span className="text-xs text-muted-foreground">L/S Ratio:</span>
+            <span className="font-mono text-xs font-bold text-foreground">{ratio}</span>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative">
         <div className="grid grid-cols-2 gap-6">
           {/* Pie Chart */}
           <div className="h-[200px]">
@@ -109,9 +119,9 @@ export function DirectionalBias({ trades }: DirectionalBiasProps) {
                       const data = payload[0].payload;
                       const percentage = (data.value / stats.total) * 100;
                       return (
-                        <div className="rounded-lg border bg-card p-3 shadow-lg">
-                          <p className="font-medium">{data.name}</p>
-                          <p className="font-mono text-sm">
+                        <div className="rounded-xl border border-border/50 bg-card/95 backdrop-blur-xl p-3 shadow-xl shadow-black/20">
+                          <p className="font-semibold text-foreground mb-1">{data.name}</p>
+                          <p className="font-mono text-sm text-muted-foreground">
                             {data.value} trades ({percentage.toFixed(1)}%)
                           </p>
                         </div>
@@ -127,28 +137,30 @@ export function DirectionalBias({ trades }: DirectionalBiasProps) {
           {/* Stats */}
           <div className="space-y-4">
             {/* Long Stats */}
-            <div className="p-3 bg-profit/10 rounded-lg border border-profit/20">
-              <div className="flex items-center gap-2 mb-2">
-                <ArrowUpRight className="h-5 w-5 text-profit" />
-                <span className="font-medium text-profit">Long</span>
+            <div className="p-3 bg-emerald-500/5 rounded-xl border border-emerald-500/20 transition-all hover:bg-emerald-500/10">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="rounded-lg bg-emerald-500/10 p-1.5">
+                  <ArrowUpRight className="h-4 w-4 text-emerald-400" />
+                </div>
+                <span className="font-semibold text-emerald-400">Long</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Trades</p>
-                  <p className="font-mono font-medium">{stats.long.count}</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Trades</p>
+                  <p className="font-mono font-bold text-foreground">{stats.long.count}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Win Rate</p>
-                  <p className="font-mono font-medium">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Win Rate</p>
+                  <p className="font-mono font-bold text-foreground">
                     {stats.long.winRate.toFixed(1)}%
                   </p>
                 </div>
-                <div className="col-span-2">
-                  <p className="text-muted-foreground">PnL</p>
+                <div className="col-span-2 mt-1">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">PnL</p>
                   <p
                     className={cn(
-                      "font-mono font-medium",
-                      stats.long.pnl >= 0 ? "text-profit" : "text-loss"
+                      "font-mono font-bold text-lg",
+                      stats.long.pnl >= 0 ? "text-emerald-400" : "text-red-400"
                     )}
                   >
                     {stats.long.pnl >= 0 ? "+" : ""}
@@ -159,28 +171,30 @@ export function DirectionalBias({ trades }: DirectionalBiasProps) {
             </div>
 
             {/* Short Stats */}
-            <div className="p-3 bg-loss/10 rounded-lg border border-loss/20">
-              <div className="flex items-center gap-2 mb-2">
-                <ArrowDownRight className="h-5 w-5 text-loss" />
-                <span className="font-medium text-loss">Short</span>
+            <div className="p-3 bg-red-500/5 rounded-xl border border-red-500/20 transition-all hover:bg-red-500/10">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="rounded-lg bg-red-500/10 p-1.5">
+                  <ArrowDownRight className="h-4 w-4 text-red-400" />
+                </div>
+                <span className="font-semibold text-red-400">Short</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Trades</p>
-                  <p className="font-mono font-medium">{stats.short.count}</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Trades</p>
+                  <p className="font-mono font-bold text-foreground">{stats.short.count}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Win Rate</p>
-                  <p className="font-mono font-medium">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Win Rate</p>
+                  <p className="font-mono font-bold text-foreground">
                     {stats.short.winRate.toFixed(1)}%
                   </p>
                 </div>
-                <div className="col-span-2">
-                  <p className="text-muted-foreground">PnL</p>
+                <div className="col-span-2 mt-1">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">PnL</p>
                   <p
                     className={cn(
-                      "font-mono font-medium",
-                      stats.short.pnl >= 0 ? "text-profit" : "text-loss"
+                      "font-mono font-bold text-lg",
+                      stats.short.pnl >= 0 ? "text-emerald-400" : "text-red-400"
                     )}
                   >
                     {stats.short.pnl >= 0 ? "+" : ""}

@@ -185,47 +185,67 @@ export default function HelpPage() {
       </Card>
 
       {/* Resources */}
-      <Card>
+      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Resources</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2">
             <a
-              href="https://deriverse.io"
+              href="https://www.deriverse.io"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 p-3 rounded-lg border hover:bg-muted transition-colors"
+              className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-violet-500/10 to-purple-600/10 border border-primary/30 hover:from-violet-500/20 hover:to-purple-600/20 transition-all duration-200 group"
             >
-              <ExternalLink className="h-4 w-4" />
-              <span>Deriverse Website</span>
+              <div className="rounded-lg bg-primary/10 p-2">
+                <ExternalLink className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <span className="font-medium text-foreground group-hover:text-primary transition-colors">Deriverse Official</span>
+                <p className="text-xs text-muted-foreground">www.deriverse.io</p>
+              </div>
             </a>
             <a
               href="https://docs.deriverse.io"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 p-3 rounded-lg border hover:bg-muted transition-colors"
+              className="flex items-center gap-3 p-4 rounded-xl border border-border/50 hover:bg-muted/50 transition-all duration-200"
             >
-              <ExternalLink className="h-4 w-4" />
-              <span>Deriverse Documentation</span>
+              <div className="rounded-lg bg-muted p-2">
+                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div>
+                <span className="font-medium">Deriverse Documentation</span>
+                <p className="text-xs text-muted-foreground">docs.deriverse.io</p>
+              </div>
             </a>
             <a
               href="https://solana.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 p-3 rounded-lg border hover:bg-muted transition-colors"
+              className="flex items-center gap-3 p-4 rounded-xl border border-border/50 hover:bg-muted/50 transition-all duration-200"
             >
-              <ExternalLink className="h-4 w-4" />
-              <span>Solana Website</span>
+              <div className="rounded-lg bg-muted p-2">
+                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div>
+                <span className="font-medium">Solana Website</span>
+                <p className="text-xs text-muted-foreground">solana.com</p>
+              </div>
             </a>
             <a
               href="https://explorer.solana.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 p-3 rounded-lg border hover:bg-muted transition-colors"
+              className="flex items-center gap-3 p-4 rounded-xl border border-border/50 hover:bg-muted/50 transition-all duration-200"
             >
-              <ExternalLink className="h-4 w-4" />
-              <span>Solana Explorer</span>
+              <div className="rounded-lg bg-muted p-2">
+                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div>
+                <span className="font-medium">Solana Explorer</span>
+                <p className="text-xs text-muted-foreground">explorer.solana.com</p>
+              </div>
             </a>
           </div>
         </CardContent>
