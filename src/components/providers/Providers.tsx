@@ -15,6 +15,8 @@ import { clusterApiUrl } from "@solana/web3.js";
 // Import wallet adapter styles
 import "@solana/wallet-adapter-react-ui/styles.css";
 
+import { DeriverseProvider } from "./DeriverseProvider";
+
 interface ProvidersProps {
   children: ReactNode;
 }
@@ -54,7 +56,9 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <ConnectionProvider endpoint={MAINNET_ENDPOINT}>
       <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>{children}</WalletModalProvider>
+        <WalletModalProvider>
+          <DeriverseProvider>{children}</DeriverseProvider>
+        </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
   );

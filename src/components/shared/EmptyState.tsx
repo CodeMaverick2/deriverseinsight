@@ -49,7 +49,7 @@ export function EmptyState({ isConnected, className }: EmptyStateProps) {
           No Trading History Found
         </h3>
         <p className="text-muted-foreground max-w-md mb-6">
-          Your connected wallet doesn't have any trades on Deriverse yet. Start trading to see your analytics here.
+          Your connected wallet has no trades on Deriverse yet. Start trading to see your analytics here.
         </p>
         <Link href="https://www.deriverse.io" target="_blank">
           <Button className="gap-2 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700">

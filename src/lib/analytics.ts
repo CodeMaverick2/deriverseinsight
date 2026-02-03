@@ -7,6 +7,9 @@ export function calculateAnalytics(trades: Trade[]) {
       totalPnl: 0,
       totalVolume: 0,
       totalFees: 0,
+      makerFees: 0,
+      takerFees: 0,
+      totalRebates: 0,
       totalTrades: 0,
       closedTrades: 0,
       openTrades: 0,
@@ -25,6 +28,10 @@ export function calculateAnalytics(trades: Trade[]) {
       longWinRate: 0,
       shortWinRate: 0,
       longShortRatio: 0,
+      bestTradingHour: -1,
+      bestTradingDay: "",
+      worstTradingHour: -1,
+      worstTradingDay: "",
     };
   }
 
@@ -35,6 +42,13 @@ export function calculateAnalytics(trades: Trade[]) {
   const totalPnl = closedTrades.reduce((sum, t) => sum + (t.pnl || 0), 0);
   const totalVolume = trades.reduce((sum, t) => sum + t.size * t.entryPrice, 0);
   const totalFees = trades.reduce((sum, t) => sum + t.fee, 0);
+
+  // Maker/Taker fee breakdown
+  const makerTrades = trades.filter((t) => t.feeType === "MAKER");
+  const takerTrades = trades.filter((t) => t.feeType === "TAKER");
+  const makerFees = makerTrades.reduce((sum, t) => sum + t.fee, 0);
+  const takerFees = takerTrades.reduce((sum, t) => sum + t.fee, 0);
+  const totalRebates = trades.reduce((sum, t) => sum + (t.rebate || 0), 0);
 
   const grossProfit = wins.reduce((sum, t) => sum + (t.pnl || 0), 0);
   const grossLoss = Math.abs(losses.reduce((sum, t) => sum + (t.pnl || 0), 0));
@@ -56,9 +70,9 @@ export function calculateAnalytics(trades: Trade[]) {
     ? tradesWithDuration.reduce((sum, t) => sum + (t.duration || 0), 0) / tradesWithDuration.length
     : 0;
 
-  // Long/Short breakdown
-  const longTrades = closedTrades.filter((t) => t.side === "LONG");
-  const shortTrades = closedTrades.filter((t) => t.side === "SHORT");
+  // Long/Short breakdown (include BUY as LONG and SELL as SHORT for spot)
+  const longTrades = closedTrades.filter((t) => t.side === "LONG" || t.side === "BUY");
+  const shortTrades = closedTrades.filter((t) => t.side === "SHORT" || t.side === "SELL");
   const longPnl = longTrades.reduce((sum, t) => sum + (t.pnl || 0), 0);
   const shortPnl = shortTrades.reduce((sum, t) => sum + (t.pnl || 0), 0);
   const longWinRate = longTrades.length > 0
@@ -68,10 +82,66 @@ export function calculateAnalytics(trades: Trade[]) {
     ? (shortTrades.filter((t) => (t.pnl || 0) > 0).length / shortTrades.length) * 100
     : 0;
 
+  // Time-based analysis: Best/Worst trading hour
+  const hourlyPnl = new Map<number, { pnl: number; trades: number }>();
+  for (const trade of closedTrades) {
+    const hour = new Date(trade.timestamp).getHours();
+    const existing = hourlyPnl.get(hour) || { pnl: 0, trades: 0 };
+    existing.pnl += trade.pnl || 0;
+    existing.trades += 1;
+    hourlyPnl.set(hour, existing);
+  }
+
+  let bestTradingHour = -1;
+  let worstTradingHour = -1;
+  let maxHourPnl = -Infinity;
+  let minHourPnl = Infinity;
+
+  hourlyPnl.forEach((data, hour) => {
+    if (data.pnl > maxHourPnl) {
+      maxHourPnl = data.pnl;
+      bestTradingHour = hour;
+    }
+    if (data.pnl < minHourPnl) {
+      minHourPnl = data.pnl;
+      worstTradingHour = hour;
+    }
+  });
+
+  // Time-based analysis: Best/Worst trading day
+  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const dailyPnl = new Map<number, { pnl: number; trades: number }>();
+  for (const trade of closedTrades) {
+    const day = new Date(trade.timestamp).getDay();
+    const existing = dailyPnl.get(day) || { pnl: 0, trades: 0 };
+    existing.pnl += trade.pnl || 0;
+    existing.trades += 1;
+    dailyPnl.set(day, existing);
+  }
+
+  let bestTradingDay = "";
+  let worstTradingDay = "";
+  let maxDayPnl = -Infinity;
+  let minDayPnl = Infinity;
+
+  dailyPnl.forEach((data, day) => {
+    if (data.pnl > maxDayPnl) {
+      maxDayPnl = data.pnl;
+      bestTradingDay = dayNames[day];
+    }
+    if (data.pnl < minDayPnl) {
+      minDayPnl = data.pnl;
+      worstTradingDay = dayNames[day];
+    }
+  });
+
   return {
     totalPnl,
     totalVolume,
     totalFees,
+    makerFees,
+    takerFees,
+    totalRebates,
     totalTrades: trades.length,
     closedTrades: closedTrades.length,
     openTrades: trades.filter((t) => t.status === "OPEN").length,
@@ -90,6 +160,10 @@ export function calculateAnalytics(trades: Trade[]) {
     longWinRate,
     shortWinRate,
     longShortRatio: shortTrades.length > 0 ? longTrades.length / shortTrades.length : longTrades.length,
+    bestTradingHour,
+    bestTradingDay,
+    worstTradingHour,
+    worstTradingDay,
   };
 }
 

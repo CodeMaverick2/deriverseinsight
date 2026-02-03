@@ -17,6 +17,7 @@ import { EquityCurve } from "@/components/charts/EquityCurve";
 import { DrawdownChart } from "@/components/charts/DrawdownChart";
 import { QuickStats } from "@/components/dashboard/QuickStats";
 import { RecentTrades } from "@/components/dashboard/RecentTrades";
+import { StreakTracker } from "@/components/dashboard/StreakTracker";
 import { PeriodSelector, getPeriodDateRange } from "@/components/shared/PeriodSelector";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useAppStore } from "@/stores/app-store";
@@ -221,11 +222,9 @@ export default function DashboardPage() {
         <EquityCurve data={equityCurveData} />
       </div>
 
-      {/* Drawdown and Quick Stats */}
+      {/* Drawdown, Quick Stats, and Streak Tracker */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <DrawdownChart data={equityCurveData} />
-        </div>
+        <DrawdownChart data={equityCurveData} />
         <QuickStats
           todayPnl={periodStats.todayPnl}
           weekPnl={periodStats.weekPnl}
@@ -235,6 +234,7 @@ export default function DashboardPage() {
           avgTradeDuration={analytics.avgDuration}
           expectancy={analytics.expectancy}
         />
+        <StreakTracker trades={trades} />
       </div>
 
       {/* Recent Trades */}

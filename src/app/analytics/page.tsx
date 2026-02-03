@@ -9,6 +9,7 @@ import { DirectionalBias } from "@/components/analytics/DirectionalBias";
 import { TimeAnalysis } from "@/components/analytics/TimeAnalysis";
 import { OrderTypeAnalysis } from "@/components/analytics/OrderTypeAnalysis";
 import { FeeBreakdown } from "@/components/analytics/FeeBreakdown";
+import { TradingScore } from "@/components/analytics/TradingScore";
 import { PeriodSelector, getPeriodDateRange } from "@/components/shared/PeriodSelector";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useAppStore } from "@/stores/app-store";
@@ -61,8 +62,13 @@ export default function AnalyticsPage() {
         <PeriodSelector value={selectedPeriod} onChange={setSelectedPeriod} />
       </div>
 
-      {/* Performance Metrics Overview */}
-      <PerformanceMetrics analytics={analytics} />
+      {/* Trading Score - Innovation Feature */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <PerformanceMetrics analytics={analytics} />
+        </div>
+        <TradingScore analytics={analytics} />
+      </div>
 
       {/* Win Rate and Volume */}
       <div className="grid gap-6 lg:grid-cols-2">

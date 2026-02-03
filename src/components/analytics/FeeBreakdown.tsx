@@ -78,6 +78,21 @@ export function FeeBreakdown({ trades, days = 30 }: FeeBreakdownProps) {
     return { spot: spotFees, perp: perpFees };
   }, [trades]);
 
+  // Calculate maker/taker breakdown
+  const feeByType = useMemo(() => {
+    const makerFees = trades
+      .filter((t) => t.feeType === "MAKER")
+      .reduce((sum, t) => sum + t.fee, 0);
+    const takerFees = trades
+      .filter((t) => t.feeType === "TAKER")
+      .reduce((sum, t) => sum + t.fee, 0);
+    const rebates = trades.reduce((sum, t) => sum + (t.rebate || 0), 0);
+    const unknownFees = trades
+      .filter((t) => !t.feeType)
+      .reduce((sum, t) => sum + t.fee, 0);
+    return { maker: makerFees, taker: takerFees, rebates, unknown: unknownFees };
+  }, [trades]);
+
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -96,21 +111,43 @@ export function FeeBreakdown({ trades, days = 30 }: FeeBreakdownProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Summary Stats */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="p-3 bg-muted/30 rounded-lg">
-            <p className="text-xs text-muted-foreground">Avg Daily</p>
+            <p className="text-xs text-muted-foreground">Taker Fees</p>
             <p className="font-mono font-semibold text-loss">
-              {formatCurrency(avgDailyFees)}
+              {formatCurrency(feeByType.taker || feeByType.unknown)}
             </p>
           </div>
           <div className="p-3 bg-muted/30 rounded-lg">
-            <p className="text-xs text-muted-foreground">Spot Fees</p>
+            <p className="text-xs text-muted-foreground">Maker Fees</p>
+            <p className="font-mono font-semibold text-amber-400">
+              {formatCurrency(feeByType.maker)}
+            </p>
+          </div>
+          <div className="p-3 bg-muted/30 rounded-lg">
+            <p className="text-xs text-muted-foreground">Rebates Earned</p>
+            <p className="font-mono font-semibold text-emerald-400">
+              +{formatCurrency(feeByType.rebates)}
+            </p>
+          </div>
+          <div className="p-3 bg-muted/30 rounded-lg">
+            <p className="text-xs text-muted-foreground">Net Fees</p>
+            <p className="font-mono font-semibold text-loss">
+              {formatCurrency(totalFees - feeByType.rebates)}
+            </p>
+          </div>
+        </div>
+
+        {/* Market breakdown */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="p-3 bg-muted/30 rounded-lg">
+            <p className="text-xs text-muted-foreground">Spot Market</p>
             <p className="font-mono font-semibold">
               {formatCurrency(feeByMarket.spot)}
             </p>
           </div>
           <div className="p-3 bg-muted/30 rounded-lg">
-            <p className="text-xs text-muted-foreground">Perp Fees</p>
+            <p className="text-xs text-muted-foreground">Perp Market</p>
             <p className="font-mono font-semibold">
               {formatCurrency(feeByMarket.perp)}
             </p>

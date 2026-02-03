@@ -13,6 +13,8 @@ export function exportToCSV(trades: Trade[], filename: string = "trades") {
     "Entry Price",
     "Exit Price",
     "Fee",
+    "Fee Type",
+    "Rebate",
     "PnL",
     "Status",
     "Leverage",
@@ -30,6 +32,8 @@ export function exportToCSV(trades: Trade[], filename: string = "trades") {
     trade.entryPrice.toFixed(6),
     trade.exitPrice?.toFixed(6) || "",
     trade.fee.toFixed(6),
+    trade.feeType || "UNKNOWN",
+    trade.rebate?.toFixed(6) || "0",
     trade.pnl?.toFixed(6) || "",
     trade.status,
     trade.leverage || "",
@@ -112,6 +116,10 @@ VOLUME & FEES
 Total Volume:        $${totalVolume.toFixed(2)}
 Total Fees:          $${totalFees.toFixed(2)}
 Fee Ratio:           ${((totalFees / totalVolume) * 100).toFixed(4)}%
+
+Maker Fees:          $${trades.filter((t) => t.feeType === "MAKER").reduce((sum, t) => sum + t.fee, 0).toFixed(2)}
+Taker Fees:          $${trades.filter((t) => t.feeType === "TAKER").reduce((sum, t) => sum + t.fee, 0).toFixed(2)}
+Total Rebates:       $${trades.reduce((sum, t) => sum + (t.rebate || 0), 0).toFixed(2)}
 
 BY MARKET TYPE
 --------------

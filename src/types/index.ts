@@ -1,8 +1,9 @@
 // Trade types
 export type MarketType = "SPOT" | "PERP";
-export type TradeSide = "LONG" | "SHORT";
+export type TradeSide = "LONG" | "SHORT" | "BUY" | "SELL";
 export type OrderType = "IOC" | "LIMIT" | "MARKET";
 export type TradeStatus = "OPEN" | "CLOSED";
+export type FeeType = "MAKER" | "TAKER";
 export type Sentiment = "BULLISH" | "BEARISH" | "NEUTRAL";
 
 export interface Trade {
@@ -16,6 +17,8 @@ export interface Trade {
   entryPrice: number;
   exitPrice?: number;
   fee: number;
+  feeType?: FeeType; // Maker vs Taker for fee analysis
+  rebate?: number; // Maker rebate amount
   pnl?: number;
   status: TradeStatus;
   duration?: number; // in milliseconds

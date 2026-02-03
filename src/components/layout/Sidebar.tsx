@@ -26,44 +26,16 @@ import {
 } from "@/components/ui/tooltip";
 
 const navItems = [
-  {
-    title: "Dashboard",
-    href: "/",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Portfolio",
-    href: "/portfolio",
-    icon: PieChart,
-  },
-  {
-    title: "Journal",
-    href: "/journal",
-    icon: BookOpen,
-  },
-  {
-    title: "Analytics",
-    href: "/analytics",
-    icon: BarChart3,
-  },
-  {
-    title: "History",
-    href: "/history",
-    icon: History,
-  },
+  { title: "Dashboard", href: "/", icon: LayoutDashboard },
+  { title: "Portfolio", href: "/portfolio", icon: PieChart },
+  { title: "Journal", href: "/journal", icon: BookOpen },
+  { title: "Analytics", href: "/analytics", icon: BarChart3 },
+  { title: "History", href: "/history", icon: History },
 ];
 
 const bottomNavItems = [
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: Settings,
-  },
-  {
-    title: "Help",
-    href: "/help",
-    icon: HelpCircle,
-  },
+  { title: "Settings", href: "/settings", icon: Settings },
+  { title: "Help", href: "/help", icon: HelpCircle },
 ];
 
 export function Sidebar() {
@@ -117,6 +89,7 @@ export function Sidebar() {
                 <TooltipTrigger asChild>
                   <Link
                     href={item.href}
+                    prefetch={true}
                     className={cn(
                       "relative flex h-11 w-full items-center justify-center rounded-xl transition-all duration-200",
                       isActive
@@ -138,6 +111,7 @@ export function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={true}
                 className={cn(
                   "group relative flex h-11 items-center gap-3 rounded-xl px-3 transition-all duration-200",
                   isActive
@@ -172,6 +146,7 @@ export function Sidebar() {
                 <TooltipTrigger asChild>
                   <Link
                     href={item.href}
+                    prefetch={true}
                     className={cn(
                       "flex h-10 w-full items-center justify-center rounded-xl transition-all duration-200",
                       isActive
@@ -190,6 +165,7 @@ export function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={true}
                 className={cn(
                   "flex h-10 items-center gap-3 rounded-xl px-3 transition-all duration-200",
                   isActive

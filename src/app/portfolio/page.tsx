@@ -20,11 +20,40 @@ export default function PortfolioPage() {
 
   const hasData = trades.length > 0 || positions.length > 0;
 
-  // Generate equity curve from trades
+  // Generate equity curve from trades - must be before any conditional returns
   const equityCurve = useMemo(() => {
     if (trades.length === 0) return [];
     return generateEquityCurve(trades);
   }, [trades]);
+
+  // Calculate total portfolio value - must be before any conditional returns
+  const totalPortfolioValue = useMemo(() => {
+    return positions.reduce(
+      (sum, pos) => sum + pos.size * pos.currentPrice,
+      0
+    );
+  }, [positions]);
+
+  // Calculate total unrealized PnL - must be before any conditional returns
+  const totalUnrealizedPnl = useMemo(() => {
+    return positions.reduce((sum, pos) => sum + pos.unrealizedPnl, 0);
+  }, [positions]);
+
+  // Calculate total margin used - must be before any conditional returns
+  const totalMargin = useMemo(() => {
+    return positions.reduce((sum, pos) => sum + (pos.margin || 0), 0);
+  }, [positions]);
+
+  // Calculate average leverage - must be before any conditional returns
+  const avgLeverage = useMemo(() => {
+    if (positions.length === 0) return 0;
+    const leveragedPositions = positions.filter((p) => p.leverage);
+    if (leveragedPositions.length === 0) return 0;
+    return (
+      leveragedPositions.reduce((sum, p) => sum + (p.leverage || 0), 0) /
+      leveragedPositions.length
+    );
+  }, [positions]);
 
   // Show empty state if no data
   if (!hasData) {
@@ -40,35 +69,6 @@ export default function PortfolioPage() {
       </div>
     );
   }
-
-  // Calculate total portfolio value
-  const totalPortfolioValue = useMemo(() => {
-    return positions.reduce(
-      (sum, pos) => sum + pos.size * pos.currentPrice,
-      0
-    );
-  }, [positions]);
-
-  // Calculate total unrealized PnL
-  const totalUnrealizedPnl = useMemo(() => {
-    return positions.reduce((sum, pos) => sum + pos.unrealizedPnl, 0);
-  }, [positions]);
-
-  // Calculate total margin used
-  const totalMargin = useMemo(() => {
-    return positions.reduce((sum, pos) => sum + (pos.margin || 0), 0);
-  }, [positions]);
-
-  // Calculate average leverage
-  const avgLeverage = useMemo(() => {
-    if (positions.length === 0) return 0;
-    const leveragedPositions = positions.filter((p) => p.leverage);
-    if (leveragedPositions.length === 0) return 0;
-    return (
-      leveragedPositions.reduce((sum, p) => sum + (p.leverage || 0), 0) /
-      leveragedPositions.length
-    );
-  }, [positions]);
 
   return (
     <div className="space-y-6">
